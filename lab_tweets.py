@@ -26,11 +26,16 @@ for phrase in phrases:
 
 total = len(tweets)
 width = max(len(p) for p in phrases)
-print(f"| {'phrase' :>{width}} | percent of tweets |")
-print(f"| {'-' * width} | {'-' * 15 } |")
+lines = []
+lines.append(f"| {'phrase' :>{width}} | percent of tweets |")
+lines.append(f"| {'-' * width} | {'-' * 15 } |")
 for phrase in sorted(phrases):
     percent = counts[phrase] / total * 100
-    print(f"| {phrase :>{width}} | {percent:05.2f}% |")
+    lines.append(f"| {phrase :>{width}} | {percent:05.2f} |")
+
+print('\n'.join(lines))
+with open('table.md', 'w') as f:
+    f.write('\n'.join(lines))
 
 
 names = sorted(phrases)
@@ -43,9 +48,3 @@ plt.title('Frequency of Keywords in Tweets, 2009-2018')
 plt.tight_layout()
 plt.savefig('tweets.png')
 
-with open('table.md', 'w') as f:
-    f.write(f"| {'phrase' :>{width}} | percent of tweets |\n")
-    f.write(f"| {'-' * width} | {'-' * 15 } |\n")
-    for phrase in sorted(phrases):
-        percent = counts[phrase] / total * 100
-        f.write(f"| {phrase :>{width}} | {percent:05.2f}% |\n")

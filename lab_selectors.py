@@ -68,7 +68,11 @@ def extract_prices_cents(html):
     # TODO: for each '.price', strip the '$', convert dollars to an int of cents
     # Hint: int(round(float(dollars) * 100)) turns '49.99' into 4999
     soup = BeautifulSoup(html, 'html.parser')
-    return [int(round(float(tag.text.strip('$').replace(',', '')) * 100)) for tag in soup.select('.price')]
+    prices = []
+    for tag in soup.select('.price'):
+        text = tag.text.strip().lstrip('$').replace(',', '')
+        prices.append(int(round(float(text) * 100)))
+    return prices
 
 def count_free_shipping(html):
     '''
@@ -115,13 +119,21 @@ def extract_listings(html):
     for item in soup.select('.item'):
         title_tag = item.select_one('.title')
         price_tag = item.select_one('.price')
-        if title_tag and price_tag:
-            listings.append({
-                'name': title_tag.text.strip(),
-                'price_cents': int(round(float(price_tag.text.strip('$').replace(',', '')) * 100)),
-                'url': title_tag['href']
-            })
-    return listings     
+        
+        name = title_tag.text.strip() if title_tag else None
+        url = title_tag.get('href') if title_tag else None
+        if price_tag:
+            text = price_tag.text.strip().lstrip('$').replace(',', '')
+            price_cents = int(round(float(text) * 100))
+        else:
+            price_cents = None
+
+        listings.append({
+            'name': name,
+            'price_cents': price_cents,
+            'url': url
+        })
+    return listings
 
 if __name__ == '__main__':
     import doctest
